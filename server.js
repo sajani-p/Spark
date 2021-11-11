@@ -1,6 +1,7 @@
 const express = require ("express");
 const mongoose = require ("mongoose");
 const Book = require ("./models/book");
+const Member = require ("./models/member");
 
 const server = express();
 
@@ -41,6 +42,10 @@ server.use(express.json());
 //         burrowedDate: "", 
 //     },
 // ];
+
+// ==========================================================
+//                     Book API
+// ========================================================== 
 
 // /book - view all books
 server.get("/book", async (req, res) => {
@@ -166,5 +171,77 @@ server.delete("/book/:id", async (req, res) => {
     // res.send(id);
 
     const book = await Book.findByIdAndDelete(id);
+    res.send(id);
+});
+
+// ==========================================================
+//                     Member API
+// ==========================================================                    
+// /member - view all members
+server.get("/member", async (req, res) => {
+    const members = await Member.find();
+    res.send(members);
+});
+
+// /member/:id - view single member
+server.get("/member/:id", async (req,res) => {
+    const id = req.params.id;
+
+    const member = await Member.findById(id);
+    res.send(member);
+});
+
+// /member : POST - Create member
+// nic, firstName,middleName,lastName,contactNumber,address,userType
+server.post("/member", async (req, res) => {
+    const { 
+        nic, 
+        firstName,
+        middleName,
+        lastName,
+        contactNumber,
+        address,
+        userType
+    } = req.body;
+
+    const member = new Member({ nic, firstName,middleName,lastName,contactNumber,address,userType });
+    const response = await member.save();
+    res.send(response);  
+});
+
+// /member/:id: Edit member
+// /member/1
+// nic, firstName, middleName, lastName, contactNumber, address, userType
+server.put("/member/:id", async (req, res) => {
+    const id = req.params.id;
+    const { 
+        nic, 
+        firstName,
+        middleName,
+        lastName,
+        contactNumber,
+        address,
+        userType
+     } = req.body;
+
+    const member = await Member.findByIdAndUpdate(id, {
+        nic, 
+        firstName,
+        middleName,
+        lastName,
+        contactNumber,
+        address,
+        userType,
+    });
+    res.send(member);
+
+});
+
+// /member/:id/delete: Delete member
+// /member/1/delete
+server.delete("/member/:id", async (req, res) => {
+    const id = req.params.id;
+
+    const member = await Member.findByIdAndDelete(id);
     res.send(id);
 });
